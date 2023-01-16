@@ -1,11 +1,15 @@
-from flask import Flask
+from flask import Flask, render_template, url_for, request 
 import sqlite3
 from re import sub
 import pandas as pd
 from cleanco import basename
+import pymongo
 
+# app = Flask(__name__)
 
-def clean_name(name_arg, remove_list):
+sql_database = 'semos_companies_data.db'
+
+def clean_company_name(name_arg, remove_list):
     
     for substring in remove_list:
         name_arg = sub(substring, "", name_arg)
@@ -39,32 +43,53 @@ def clean_name(name_arg, remove_list):
     
     return name_arg.title() if len(name_arg) > 4 else name_arg
 
+def update_db(sql_db, chunksize):
+    conn = sqlite3.connect(sql_db)
+    
+    remove_list = ("\(.*?\)", r"\(.*\)", "LIMITED", " LTD.", " LTD")
 
-# app = Flask(__name__)
+    df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=chunksize)
 
-# @app.route("/")
-# def connect_to_sqlite():
-#     con = sqlite3.connect("semos_companies_data.db")
-#     cur = con.cursor()
+    for chunk in df:
+    
+        for name, id in zip(chunk['name'], chunk['id']):
+        
+            cleaned_name = clean_company_name(name, remove_list)
+        
+            conn.execute("UPDATE companies SET company_name_cleaned = ? WHERE id = ? ", (cleaned_name, id))
+        
+        conn.commit()
 
-#     return "success"
+    conn.close()
+
+
+##################### Flask ########################
+
+# @app.route("/", methods=['POST', 'GET'])
+# def index():
+#     return render_template('index.html')
         
 # app.run(debug=True)
 
-conn = sqlite3.connect('semos_companies_data.db')
+####################################################
 
-remove_list = ("\(.*?\)", r"\(.*\)", "LIMITED", " LTD.", " LTD")
+db_values = ['id', 'name', 'country_iso', 'city', 'nace', 'website']
 
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myclient["mydatabase"]
+mycol = mydb["companies"]
+
+conn = sqlite3.connect(sql_database)
 df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=1000)
 
 for chunk in df:
     
-    for name, id in zip(chunk['name'], chunk['id']):
+    for company_name_cleaned, id, name, country_iso, city, nace, website in zip(chunk['company_name_cleaned'], chunk['id'], chunk['name'], chunk['country_iso'], chunk['city'], chunk['nace'], chunk['website']):
+        mydict = { company_name_cleaned: {'id': id, 'name': name, 'country_iso': country_iso, 'city': city, 'nace': nace, 'website': website}}
         
-        cleaned_name = clean_name(name, remove_list)
+    # for index in range(len(chunk)):
+    #     mydict = { chunk['company_name_cleaned'][index]: [{x: f'{chunk[x][index]}'} for x in db_values]}
         
-        conn.execute("UPDATE companies SET company_name_cleaned = ? WHERE id = ? ", (cleaned_name, id))
-        
-    conn.commit()
-    
+        mycol.insert_one(mydict)
+
 conn.close()
