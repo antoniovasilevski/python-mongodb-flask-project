@@ -4,6 +4,7 @@ from re import sub
 import pandas as pd
 from cleanco import basename
 import pymongo
+import numpy
 
 # app = Flask(__name__)
 
@@ -44,10 +45,8 @@ def clean_company_name(name_arg, remove_list):
     return name_arg.title() if len(name_arg) > 4 else name_arg
 
 def update_db(sql_db, chunksize):
-    conn = sqlite3.connect(sql_db)
-    
     remove_list = ("\(.*?\)", r"\(.*\)", "LIMITED", " LTD.", " LTD")
-
+    conn = sqlite3.connect(sql_db)
     df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=chunksize)
 
     for chunk in df:
@@ -62,7 +61,34 @@ def update_db(sql_db, chunksize):
 
     conn.close()
 
+def write_to_mongodb(sql_db):
+    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    mydb = myclient["mydatabase"]
+    mycol = mydb["companies"]
+    
+    conn = sqlite3.connect(sql_db)
+    df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=1000)
 
+    for chunk in df:
+        
+        for company_name_cleaned, id, name, country_iso, city, nace, website in zip(
+            chunk['company_name_cleaned'], chunk['id'], chunk['name'], chunk['country_iso'], chunk['city'], chunk['nace'], chunk['website']):
+
+            company = {}
+            columns = {}
+            columns['id'] = id
+            columns['name'] = name
+            columns['country_iso'] = country_iso
+            columns['city'] = city
+            columns['nace'] = nace
+            columns['website'] = website
+            
+            company[company_name_cleaned] = columns
+            
+            mycol.insert_one(company)
+
+    conn.close()
+    
 ##################### Flask ########################
 
 # @app.route("/", methods=['POST', 'GET'])
@@ -72,24 +98,3 @@ def update_db(sql_db, chunksize):
 # app.run(debug=True)
 
 ####################################################
-
-db_values = ['id', 'name', 'country_iso', 'city', 'nace', 'website']
-
-myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-mydb = myclient["mydatabase"]
-mycol = mydb["companies"]
-
-conn = sqlite3.connect(sql_database)
-df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=1000)
-
-for chunk in df:
-    
-    for company_name_cleaned, id, name, country_iso, city, nace, website in zip(chunk['company_name_cleaned'], chunk['id'], chunk['name'], chunk['country_iso'], chunk['city'], chunk['nace'], chunk['website']):
-        mydict = { company_name_cleaned: {'id': id, 'name': name, 'country_iso': country_iso, 'city': city, 'nace': nace, 'website': website}}
-        
-    # for index in range(len(chunk)):
-    #     mydict = { chunk['company_name_cleaned'][index]: [{x: f'{chunk[x][index]}'} for x in db_values]}
-        
-        mycol.insert_one(mydict)
-
-conn.close()
