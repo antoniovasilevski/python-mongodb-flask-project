@@ -4,6 +4,7 @@ from re import sub
 import pandas as pd
 from cleanco import basename
 import pymongo
+import jinja2
 
 def clean_company_name(name_arg, remove_list):
     
@@ -24,9 +25,6 @@ def clean_company_name(name_arg, remove_list):
             
     while "  " in name_arg:
         name_arg = sub("  ", " ", name_arg)
-    
-    while " AND " in name_arg:
-        name_arg = sub("AND", "&", name_arg)
         
     if "THE" in name_arg:
         modified = name_arg.split(" ")
@@ -40,20 +38,28 @@ def clean_company_name(name_arg, remove_list):
     return name_arg.title() if len(name_arg) > 4 else name_arg
 
 def update_db():
-    sql_database = 'semos_companies_data.db'
     remove_list = ("\(.*?\)", r"\(.*\)", "LIMITED", " LTD.", " LTD")
-    conn = sqlite3.connect(sql_database)
-    df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=1000)
-
-    for chunk in df:
     
-        for name, id in zip(chunk['name'], chunk['id']):
+    sql_database = 'semos_companies_data.db'
+    conn = sqlite3.connect(sql_database)
+    cursor = conn.cursor()
+    df = pd.read_sql_query("SELECT * FROM companies", conn)
+    
+    try:
+        cursor.execute("ALTER TABLE companies DROP COLUMN company_name_cleaned")
+    except:
+        pass
+    
+    company_data = dict(df)
+    company_data['company_name_cleaned'] = []
         
-            cleaned_name = clean_company_name(name, remove_list)
-            pd.DataFrame.to_sql()
-            conn.execute("UPDATE companies SET company_name_cleaned = ? WHERE id = ? ", (cleaned_name, id))
-        
-        conn.commit()
+    for name in df.name:
+            
+        cleaned_name = clean_company_name(name, remove_list)
+        company_data['company_name_cleaned'].append(cleaned_name)
+    
+    company_data = pd.DataFrame(company_data)
+    company_data.to_sql('companies', conn, if_exists='replace', index=False)
         
     conn.close()
     
@@ -86,13 +92,17 @@ def write_to_mongodb():
             
     conn.close()    
 
-def read_mongodb():
+def mongodb_to_html():
     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
     mydb = myclient["test_db"]
     mycol = mydb["companies"]
     
-    for id in range(20):
-        myquery = {'_id': id+1}
+    with open("templates/index.html", "w") as html_file:
+        html_file.write("{% block body%}<div class="">{% endblock %}")
+        
+    
+    for id in range(1, 21):
+        myquery = {'_id': id}
         data = mycol.find_one(myquery)
         print(data)
 

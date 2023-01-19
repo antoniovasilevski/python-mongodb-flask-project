@@ -6,19 +6,28 @@
 
 {% block body %}
 <div class="content">
-    <table>
-        <tr>
-            <td>
-                <form method="post" action="/update_sql">
-                    <input type="submit" name="sqldb" value="Update the SQL database"></input>
-                </form></td>
-            <td>
-                <form method="post" action="/write_to_mongodb">
-                    <input type="submit" name="mongodb" value="Create a MongoDB"></input>
-                </form>
-        </td>
-        </tr>
-    </table>
+    <div class="buttons">
+        <table>
+            <tr>
+                <td>
+                    <form method="post" action="/update_sql">
+                        <input type="submit" name="sqldb" value="Update the SQL database"></input>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="/write_to_mongodb">
+                        <input type="submit" name="mongodb" value="Create a MongoDB"></input>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="mongodb-content">
+        <table>
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </div>
 </div>
-
 {% endblock %}
