@@ -4,11 +4,6 @@ from re import sub
 import pandas as pd
 from cleanco import basename
 import pymongo
-import numpy
-
-# app = Flask(__name__)
-
-sql_database = 'semos_companies_data.db'
 
 def clean_company_name(name_arg, remove_list):
     
@@ -44,29 +39,31 @@ def clean_company_name(name_arg, remove_list):
     
     return name_arg.title() if len(name_arg) > 4 else name_arg
 
-def update_db(sql_db, chunksize):
+def update_db():
+    sql_database = 'semos_companies_data.db'
     remove_list = ("\(.*?\)", r"\(.*\)", "LIMITED", " LTD.", " LTD")
-    conn = sqlite3.connect(sql_db)
-    df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=chunksize)
+    conn = sqlite3.connect(sql_database)
+    df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=1000)
 
     for chunk in df:
     
         for name, id in zip(chunk['name'], chunk['id']):
         
             cleaned_name = clean_company_name(name, remove_list)
-        
+            pd.DataFrame.to_sql()
             conn.execute("UPDATE companies SET company_name_cleaned = ? WHERE id = ? ", (cleaned_name, id))
         
         conn.commit()
-
+        
     conn.close()
-
-def write_to_mongodb(sql_db):
+    
+def write_to_mongodb():
+    sql_database = 'semos_companies_data.db'
     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-    mydb = myclient["mydatabase"]
+    mydb = myclient["test_db"]
     mycol = mydb["companies"]
     
-    conn = sqlite3.connect(sql_db)
+    conn = sqlite3.connect(sql_database)
     df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=1000)
 
     for chunk in df:
@@ -83,18 +80,51 @@ def write_to_mongodb(sql_db):
             columns['nace'] = nace
             columns['website'] = website
             
+            company['_id'] = id
             company[company_name_cleaned] = columns
-            
             mycol.insert_one(company)
+            
+    conn.close()    
 
-    conn.close()
+def read_mongodb():
+    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    mydb = myclient["test_db"]
+    mycol = mydb["companies"]
     
+    for id in range(20):
+        myquery = {'_id': id+1}
+        data = mycol.find_one(myquery)
+        print(data)
+
+
 ##################### Flask ########################
 
-# @app.route("/", methods=['POST', 'GET'])
-# def index():
-#     return render_template('index.html')
-        
-# app.run(debug=True)
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    """ 
+    Displays the index page accessible at '/'
+    """
+    return render_template('index.html')
+
+
+@app.route('/update_sql', methods=['GET', 'POST'])
+def read_update_sql():
+    if request.method == 'POST':
+        if request.form['sqldb'] == "Update the SQL database":
+            update_db()
+    return render_template('index.html')
+
+@app.route('/write_to_mongodb', methods=['GET', 'POST'])
+def writing_to_mongodb():
+    if request.method == 'POST':
+        if request.form['mongodb'] == "Create a MongoDB":
+            write_to_mongodb()   
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    app.debug=True
+    app.run()
 
 ####################################################

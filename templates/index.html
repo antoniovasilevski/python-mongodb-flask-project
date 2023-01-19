@@ -1,16 +1,24 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>MongoDN - Flask апликација</title>
+<title>MongoDB - Flask апликација</title>
 {% endblock %}
 
 {% block body %}
 <div class="content">
     <table>
         <tr>
-            <td><button>Прочисти ја дата базата</button></td>
-            <td><button>Креирај MongoDB</button></td>
+            <td>
+                <form method="post" action="/update_sql">
+                    <input type="submit" name="sqldb" value="Update the SQL database"></input>
+                </form></td>
+            <td>
+                <form method="post" action="/write_to_mongodb">
+                    <input type="submit" name="mongodb" value="Create a MongoDB"></input>
+                </form>
+        </td>
         </tr>
     </table>
 </div>
+
 {% endblock %}
