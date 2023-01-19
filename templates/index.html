@@ -19,15 +19,16 @@
                         <input type="submit" name="mongodb" value="Create a MongoDB"></input>
                     </form>
                 </td>
-            </tr>
-        </table>
-    </div>
-    <div class="mongodb-content">
-        <table>
-            <tr>
-                <td></td>
+                <td>
+                    <form method="post" action="/write_to_mongodb">
+                        <input type="submit" name="mongodb" value="Output MongoDB Objects"></input>
+                    </form>
+                </td>
             </tr>
         </table>
     </div>
 </div>
 {% endblock %}
+<div class="mongodb-content">
+    {% block content %}{% endblock %}
+</div>

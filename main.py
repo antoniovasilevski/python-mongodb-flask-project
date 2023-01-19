@@ -4,10 +4,14 @@ from re import sub
 import pandas as pd
 from cleanco import basename
 import pymongo
-import jinja2
 
 def clean_company_name(name_arg, remove_list):
     
+    if "COMMERCE" in name_arg:
+        modified = name_arg.split('COMMERCE', maxsplit=1)
+        modified[1] = ' COMMERCE' + modified[1]
+        name_arg = ' '.join(modified)
+        
     for substring in remove_list:
         name_arg = sub(substring, "", name_arg)
         
@@ -32,8 +36,17 @@ def clean_company_name(name_arg, remove_list):
         if "THE" == modified[-1]:
             modified.pop(-1)
             name_arg = ' '.join(modified)
-        
+    
     name_arg = basename(name_arg)
+    
+    modified = name_arg.split(' ')
+    if len(modified[0]) < 4:
+        for id in range(1, len(modified)):
+            modified[id] = modified[id].title()
+        name_arg = ' '.join(modified)
+        return name_arg
+            
+    name_arg = ' '.join(modified)
     
     return name_arg.title() if len(name_arg) > 4 else name_arg
 
@@ -43,10 +56,10 @@ def update_db():
     sql_database = 'semos_companies_data.db'
     conn = sqlite3.connect(sql_database)
     cursor = conn.cursor()
-    df = pd.read_sql_query("SELECT * FROM companies", conn)
+    df = pd.read_sql_query("SELECT * FROM companies", conn, dtype=object)
     
     try:
-        cursor.execute("ALTER TABLE companies DROP COLUMN company_name_cleaned")
+        cursor.execute("ALTER TABLE companies DROP COLUMN company_name_cleaned, nace")
     except:
         pass
     
@@ -54,13 +67,13 @@ def update_db():
     company_data['company_name_cleaned'] = []
         
     for name in df.name:
-            
+        
         cleaned_name = clean_company_name(name, remove_list)
         company_data['company_name_cleaned'].append(cleaned_name)
-    
+
+    company_data['nace'] = company_data['nace'].astype('Int64')
     company_data = pd.DataFrame(company_data)
     company_data.to_sql('companies', conn, if_exists='replace', index=False)
-        
     conn.close()
     
 def write_to_mongodb():
@@ -90,23 +103,41 @@ def write_to_mongodb():
             company[company_name_cleaned] = columns
             mycol.insert_one(company)
             
-    conn.close()    
-
+    conn.close()
+    
 def mongodb_to_html():
     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
     mydb = myclient["test_db"]
     mycol = mydb["companies"]
+    headers = ['Company Name Cleaned', 'ID', 'Name', 'Country Iso', 'City', 'Nace', 'Website']
     
-    with open("templates/index.html", "w") as html_file:
-        html_file.write("{% block body%}<div class="">{% endblock %}")
+    with open("templates/content.html", "w") as html_file:
+    
+        html_table_header = "{% extends 'index.html' %}\n{% block content %}\n<table>\n"
+        html_table_footer = '</table>\n{% endblock %}'
+        body = ''
+    
+        for header in headers:
+            html_table_header += '<th>' + header + '</th>'
+    
+        for id in range(1, 21):
+            myquery = {'_id': id}
+            data = mycol.find_one(myquery)
+            
+            for key, value in data.items():
+                if key != '_id':
+                    body += f'<tr>\n<td>{key}</td>'
+                try:
+                    if isinstance(value, dict):
+                        body+= ''.join([f'<td>{elem}</td>' for elem in value.values()]) + '</tr>\n'
+                except:
+                    pass
+                
+        html = html_table_header + body + html_table_footer
+        html_file.write(html)
+    
+    html_file.close()
         
-    
-    for id in range(1, 21):
-        myquery = {'_id': id}
-        data = mycol.find_one(myquery)
-        print(data)
-
-
 ##################### Flask ########################
 
 app = Flask(__name__)
@@ -117,7 +148,6 @@ def index():
     Displays the index page accessible at '/'
     """
     return render_template('index.html')
-
 
 @app.route('/update_sql', methods=['GET', 'POST'])
 def read_update_sql():
@@ -130,9 +160,16 @@ def read_update_sql():
 def writing_to_mongodb():
     if request.method == 'POST':
         if request.form['mongodb'] == "Create a MongoDB":
-            write_to_mongodb()   
-    return render_template('index.html')
-
+            try:
+                write_to_mongodb()
+                return render_template('index.html')
+            except:
+                return render_template('index.html')  
+        if request.form['mongodb'] == "Output MongoDB Objects":
+            mongodb_to_html()
+            
+            return render_template('content.html')
+            
 if __name__ == '__main__':
     app.debug=True
     app.run()
