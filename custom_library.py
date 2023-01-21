@@ -3,6 +3,14 @@ from re import sub
 import pandas as pd
 from cleanco import basename
 import pymongo
+from cryptography.fernet import Fernet
+
+def encrypt(message: bytes, key: bytes) -> bytes:
+    return Fernet(key).encrypt(message)
+
+def decrypt(token: bytes, key: bytes) -> bytes:
+    return Fernet(key).decrypt(token)
+
 
 def clean_company_name(name_arg, remove_list):
     
@@ -76,11 +84,12 @@ def update_db():
     
     conn.close()
     
-def write_to_mongodb():
+def write_to_mongodb(decrypt_key):
     
     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
     mydb = myclient["test_db"]
     mycol = mydb["companies"]
+    mycol.drop()
     
     sql_database = 'semos_companies_data.db'
     conn = sqlite3.connect(sql_database)
@@ -94,11 +103,11 @@ def write_to_mongodb():
             company = {}
             columns = {}
             columns['id'] = id
-            columns['name'] = name
+            columns['name'] = encrypt(name.encode(), decrypt_key)
             columns['country_iso'] = country_iso
             columns['city'] = city
             columns['nace'] = nace
-            columns['website'] = website
+            columns['website'] = encrypt(website.encode(), decrypt_key)
             
             company['_id'] = id
             company[company_name_cleaned] = columns
@@ -106,7 +115,7 @@ def write_to_mongodb():
             
     conn.close()
     
-def mongodb_to_html():
+def mongodb_to_html(decode_key):
     
     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
     mydb = myclient["test_db"]
@@ -119,7 +128,7 @@ def mongodb_to_html():
         html_table_header = "{% extends 'index.html' %}\n{% block content %}\n<table>\n"
         html_table_footer = '</table>\n{% endblock %}'
         body = ''
-    
+
         for header in headers:
             
             html_table_header += '<th>' + header + '</th>'
@@ -135,7 +144,10 @@ def mongodb_to_html():
                     body += f'<tr>\n<td>{ key }</td>'
                     
                 if isinstance(value, dict):
-                    body += ''.join([ f'<td>{ elem }</td>' for elem in value.values() ]) + '</tr>\n'
+                    body += ''.join([ f'<td>{ decrypt(elem, decode_key).decode() }</td>' 
+                                     if isinstance(elem, bytes) 
+                                     else f'<td>{ elem }</td>' 
+                                     for elem in value.values() ]) + '</tr>\n'
 
                 
         html_table = html_table_header + body + html_table_footer

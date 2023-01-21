@@ -1,5 +1,8 @@
 from flask import Flask, render_template, url_for, request 
 from custom_library import update_db, write_to_mongodb, mongodb_to_html
+from cryptography.fernet import Fernet
+
+key = Fernet.generate_key()
 
 ##################### Flask ########################
 
@@ -21,15 +24,16 @@ def read_update_sql():
 
 @app.route('/write_to_mongodb', methods=['GET', 'POST'])
 def writing_to_mongodb():
+    
     if request.method == 'POST':
         if request.form['mongodb'] == "Create a MongoDB":
             try:
-                write_to_mongodb()
+                write_to_mongodb(key)
                 return render_template('index.html')
             except:
-                return render_template('index.html')  
+                return render_template('index.html', outcome = "Failed")  
         if request.form['mongodb'] == "Output MongoDB Objects":
-            mongodb_to_html()
+            mongodb_to_html(key)
             
             return render_template('content.html')
             
