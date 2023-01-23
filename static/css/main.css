@@ -39,7 +39,7 @@ body {
 }
 
 .mongodb-data th {
-    /* text-align: left; */
+    text-align: left;
     font-size: 18px;
     font-weight: 500;
     background-color: #0452aa;

@@ -1,9 +1,12 @@
 from re import sub
 from timeit import timeit
+from bson import Int64
+from numpy import NaN, int32, int64, isnan
 import pandas as pd
 from cleanco import basename
 from cryptography.fernet import Fernet
 from config import connect_to_sqldb, connect_to_mongodb
+
 
 
 def encrypt(message: bytes, key: bytes) -> bytes:
@@ -50,7 +53,7 @@ def clean_company_name(name_arg):
     name_arg = basename(name_arg)
     
     modified = name_arg.split(' ')
-    if len(modified[0]) < 4:
+    if len(modified[0]) < 4 and modified[0] != "THE":
         for id in range(1, len(modified)):
             modified[id] = modified[id].title()
         name_arg = ' '.join(modified)
@@ -88,7 +91,7 @@ def update_db():
 
 
 def write_to_mongodb(decrypt_key):
-    timeit()
+
     mycol = connect_to_mongodb()
     mycol.drop()
     
@@ -104,15 +107,15 @@ def write_to_mongodb(decrypt_key):
 
             company = {}
             columns = {}
-            columns['id'] = id
+            columns['id'] = encrypt(str(id).encode(), decrypt_key)
             columns['name'] = encrypt(name.encode(), decrypt_key)
             columns['country_iso'] = encrypt(country_iso.encode(), decrypt_key)
-            columns['city'] = city
-            columns['nace'] = nace
+            columns['city'] = city if city == None else encrypt(city.encode(), decrypt_key)
+            columns['nace'] = nace if isnan(nace) else encrypt(str(nace).encode(), decrypt_key)
             columns['website'] = encrypt(website.encode(), decrypt_key)
             
             company['_id'] = id
-            company[company_name_cleaned] = columns
+            company[str(encrypt(company_name_cleaned.encode(), decrypt_key))] = columns
             companies.append(company)
             
         
@@ -145,11 +148,13 @@ def mongodb_to_html(decode_key):
             for key, value in data.items():
                 
                 if key != '_id':
-                    body += f'<tr>\n<td>{ key }</td>'
+                    key = key[2:-1]
+                    key_decoded = decrypt(key.encode(), decode_key).decode()
+                    body += f'<tr>\n<td>{ key_decoded }</td>'
                     
                 if isinstance(value, dict):
-                    body += ''.join([ f'<td>{ decrypt(elem, decode_key).decode() }</td>' 
-                                     if isinstance(elem, bytes) 
+                    body += ''.join([ f'<td>{ decrypt(elem, decode_key).decode() }</td>' if isinstance(elem, bytes)
+                                    #  else f'<td>{ decrypt(elem, decode_key).decode() }</td>'
                                      else f'<td>{ elem }</td>' 
                                      for elem in value.values() ]) + '</tr>\n'
 
