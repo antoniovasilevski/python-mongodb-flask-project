@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request 
+from flask import Flask, render_template, request 
 from custom_library import update_db, write_to_mongodb, mongodb_to_html
 from cryptography.fernet import Fernet
 
@@ -20,7 +20,7 @@ def read_update_sql():
     if request.method == 'POST':
         if request.form['sqldb'] == "Update the SQL database":
             update_db()
-    return render_template('index.html')
+    return render_template('index.html', outcome = "Success")
 
 @app.route('/write_to_mongodb', methods=['GET', 'POST'])
 def writing_to_mongodb():

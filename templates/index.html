@@ -7,21 +7,21 @@
 {% block body %}
 <div class="content">
     {{ outcome }}
-    <div class="buttons">
-        <table>
+    <div class="button-container">
+        <table class="button-table">
             <tr>
                 <td>
-                    <form method="post" action="/update_sql">
+                    <form method="post" action="/update_sql" class="function-button">
                         <input type="submit" name="sqldb" value="Update the SQL database"></input>
                     </form>
                 </td>
                 <td>
-                    <form method="post" action="/write_to_mongodb">
+                    <form method="post" action="/write_to_mongodb" class="function-button">
                         <input type="submit" name="mongodb" value="Create a MongoDB"></input>
                     </form>
                 </td>
                 <td>
-                    <form method="post" action="/write_to_mongodb">
+                    <form method="post" action="/write_to_mongodb" class="function-button">
                         <input type="submit" name="mongodb" value="Output MongoDB Objects"></input>
                     </form>
                 </td>

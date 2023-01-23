@@ -2,3 +2,54 @@ body {
     margin: 0;
     font-family: sans-serif;
 }
+
+.button-table {
+    text-align: center;
+    width: 50%;
+    margin: 30px auto;
+}
+
+.function-button input {
+    border: 3px solid #0452aa;
+    background-color: white;
+    color: #0452aa;
+    padding: 12px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.385);
+    transition: all .1s linear;
+}
+
+.function-button input:hover {
+    cursor: pointer;
+    color: white;
+    background-color: #0452aa;
+}
+
+.mongodb-data {
+    box-shadow: 0 4px 8px -4px rgba(0, 0, 0,.7);
+    width: 95%;
+    margin: 20px auto;
+}
+
+.mongodb-data, .mongodb-data th, .mongodb-data td {
+    border: 1px solid rgb(160, 160, 160);
+    border-collapse: collapse;
+    padding: 4px 5px;
+}
+
+.mongodb-data th {
+    /* text-align: left; */
+    font-size: 18px;
+    font-weight: 500;
+    background-color: #0452aa;
+    color: white;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.mongodb-data td {
+    font-size: 15px;
+}
+
+.mongodb-data tr:nth-child(even){background-color: #dadada;}
