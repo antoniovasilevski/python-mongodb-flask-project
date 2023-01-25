@@ -1,0 +1,20 @@
+{% extends 'index.html' %}
+{% block input %}
+<table class="input-table">
+    <tr>
+        <form method="post" action="/write_to_mongodb" class="function-call">
+            <td>
+                <input type="text" name="content" class="input-field" placeholder="1-20" pattern="[0-9]{1,5}-[0-9]{1,5}">
+            </td>
+            <td>
+                <input type="submit" name="mongodb" value="Output MongoDB Objects" class="input-button" >
+            </td>
+        </form>
+    </tr>
+</table>
+</div>
+</div>
+{% endblock %}
+<div class="mongodb-content">
+    {% block table %}{% endblock %}
+</div>

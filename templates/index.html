@@ -11,25 +11,17 @@
         <table class="button-table">
             <tr>
                 <td>
-                    <form method="post" action="/update_sql" class="function-button">
-                        <input type="submit" name="sqldb" value="Update the SQL database"></input>
+                    <form method="post" action="/update_sql" class="function-call">
+                        <input type="submit" name="sqldb" value="Update the SQL database" class="function-button">
                     </form>
                 </td>
                 <td>
-                    <form method="post" action="/write_to_mongodb" class="function-button">
-                        <input type="submit" name="mongodb" value="Create a MongoDB"></input>
-                    </form>
-                </td>
-                <td>
-                    <form method="post" action="/write_to_mongodb" class="function-button">
-                        <input type="submit" name="mongodb" value="Output MongoDB Objects"></input>
+                    <form method="post" action="/write_to_mongodb" class="function-call">
+                        <input type="submit" name="mongodb" value="Create a MongoDB" class="function-button" onclick="document.getElementsByClassName('input-table').style.display=('')">
                     </form>
                 </td>
             </tr>
         </table>
-    </div>
-</div>
-{% endblock %}
-<div class="mongodb-content">
-    {% block content %}{% endblock %}
-</div>
+{% endblock %} 
+{% block input %}{% endblock %}
+

@@ -1,11 +1,7 @@
 ﻿<!-- PROJECT LOGO -->
 <br />
-<div align="center">
-  <a href="https://github.com/antoniovasilevski/python-mongodb-flask-project">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
 
-<h3 align="center">Normalizer</h3>
+<h1 align="center">Normalizer</h1>
 
   <p align="center">
     Flask based web application used to normalizes company names and export the data to a MongoDB database.
@@ -89,8 +85,8 @@ To get a local copy up and running follow these simple example steps.
    ```
 4. Configure your MongoDB collection in `config.py`
    ```py
-   mydb = myclient["test_db"]
-   mycol = mydb["companies"]
+   mydb = myclient["your-mongodb"]
+   mycol = mydb["your-collection"]
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -98,8 +94,8 @@ To get a local copy up and running follow these simple example steps.
 
 
 <!-- USAGE EXAMPLES -->
-## Usage
-
+## Usage 
+<!-- TODO Finish this -->
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
