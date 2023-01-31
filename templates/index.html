@@ -16,12 +16,44 @@
                     </form>
                 </td>
                 <td>
-                    <form method="post" action="/write_to_mongodb" class="function-call">
-                        <input type="submit" name="mongodb" value="Create a MongoDB" class="function-button" onclick="document.getElementsByClassName('input-table').style.display=('')">
+                    <form id="mongodb-writer" method="post" action="/write_to_mongodb" class="function-call">
+                        <input type="submit" name="mongodb-write" value="Create a MongoDB" class="function-button" onclick="showOnClick()">
                     </form>
                 </td>
             </tr>
         </table>
+    </div>
+</div>
+<table class="loading-container invisible" style="display: none">
+    <tr>
+        <td>
+        <div class="lds-spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span class="loading-text"></span>
+        </td>
+    </tr>
+</table>
+<script type = "text/javascript">  
+    function showOnClick() {  
+        var showDiv = document.querySelector('.invisible').style.display = '';
+    };
+</script>  
 {% endblock %} 
 {% block input %}{% endblock %}
 

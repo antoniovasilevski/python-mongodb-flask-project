@@ -2,18 +2,32 @@
 {% block input %}
 <table class="input-table">
     <tr>
-        <form method="post" action="/write_to_mongodb" class="function-call">
+        <form name="input-form" method="post" action="/write_to_mongodb" class="function-call">
             <td>
-                <input type="text" name="content" class="input-field" placeholder="1-20" pattern="[0-9]{1,5}-[0-9]{1,5}">
+                <input id="min-input" type="number" name="min-range" class="input-field" placeholder="1" min="1" max="20000">
             </td>
             <td>
-                <input type="submit" name="mongodb" value="Output MongoDB Objects" class="input-button" >
+                <div class="dash">-</div>
+            </td>
+            <td>
+                <input id="max-input" type="number" name="max-range" class="input-field" placeholder="20" min="1" max="20000">
+            </td>
+            <td>
+                <input type="submit" name="mongodb-read" value="Output MongoDB Objects" class="input-button">
             </td>
         </form>
     </tr>
 </table>
-</div>
-</div>
+<script type="text/javascript">
+    document.querySelector('.input-button').addEventListener('click', function(event) {
+        var min = parseInt(document.getElementById('min-input').value);
+        var max = parseInt(document.getElementById('max-input').value);
+        if (max < min) {
+            alert('Error: the maximum value cannot be less than the minimum value');
+            event.preventDefault();
+        }
+    });
+</script>
 {% endblock %}
 <div class="mongodb-content">
     {% block table %}{% endblock %}

@@ -4,6 +4,8 @@ from cryptography.fernet import Fernet
 from config import get_key
 
 app = Flask(__name__)
+
+# Generating fernet key, harcoded for easier debuging
 # app.secret_key = get_key()
 app.secret_key = b'eqfQr4AywieA6IchMDPBh5vaYAC_GKjvPwNc3ss-EtM='
 
@@ -23,10 +25,8 @@ def read_update_sql():
     if request.method == 'POST':
         if request.form['sqldb'] == "Update the SQL database":
             update_db()
-            return render_template('index.html', outcome = "Success")
+            return render_template('index.html')
 
-
-# TODO add website updateing with flash
 @app.route('/write_to_mongodb', methods=['GET', 'POST'])
 def writing_to_mongodb():
     """
@@ -35,21 +35,23 @@ def writing_to_mongodb():
     if request.method == 'POST':
         # Waits for a "Create a MongoDB" request, calls a function that reads the SQL db,
         # encrypts it and writes it to a MongoDB collection.
-        if request.form['mongodb'] == "Create a MongoDB":
+
+        if request.form.get('mongodb-write') == "Create a MongoDB":
             write_to_mongodb(app.secret_key)
             return render_template('input.html')
 
-            
         # Wait for a value in the input field and a "Output MongoDB Objects" request.
         # Then call a function reads, decrypts the MongoDB and outputs it to an HTML table.
-        if request.form['mongodb'] == "Output MongoDB Objects":
+
+        if request.form.get('mongodb-read') == "Output MongoDB Objects" :
 
             # Default value is 1-20 if no output range is input
-            output_range = request.form['content'] if request.form['content'] else "1-20"
-            mongodb_to_html(app.secret_key, output_range) 
+            min_range = int(request.form['min-range']) if request.form['min-range'] else 1
+            max_range = int(request.form['max-range']) if request.form['max-range'] else 20
+            mongodb_to_html(app.secret_key, min_range, max_range) 
             
             return render_template('content.html')
-            
+
             
 if __name__ == '__main__':
     app.debug=True

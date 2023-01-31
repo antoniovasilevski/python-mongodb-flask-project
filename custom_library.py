@@ -132,8 +132,8 @@ def write_to_mongodb(secret_key):
         for company_name_cleaned, id, name, country_iso, city, nace, website in zip(
             chunk['company_name_cleaned'], chunk['id'], chunk['name'], chunk['country_iso'], chunk['city'], chunk['nace'], chunk['website']):
 
-            company = {}
-            columns = {}
+            company = dict()
+            columns = dict()
             columns['id'] = encrypt(str(id).encode(), secret_key)
             columns['name'] = encrypt(name.encode(), secret_key)
             columns['country_iso'] = encrypt(country_iso.encode(), secret_key)
@@ -158,16 +158,13 @@ def write_to_mongodb(secret_key):
     conn.close()
     
     
-def mongodb_to_html(secret_key, output_range):
+def mongodb_to_html(secret_key, min, max):
     """
     Gets 2 integers in output range, gets all the MongoDB objects with _id in that range.
     Decrypts the data and writes it in a html table.
     """
     
     # Format output_range string into 2 integers.
-    output_range = output_range.split("-")
-    num = [int32(n) for n in output_range]
-    
     # Get MongoDB collection
     mycol = connect_to_mongodb()
     
@@ -187,7 +184,7 @@ def mongodb_to_html(secret_key, output_range):
             html_table_header += '<th>' + header + '</th>'
 
         # Iterate through the output range that the function gets as an argument.
-        for id in range(num[0], num[1]+1):
+        for id in range(min, max+1):
             
             # Get each object within range.
             myquery = {'_id': id}
@@ -222,6 +219,3 @@ def mongodb_to_html(secret_key, output_range):
         html_file.write(html_table)
     
     html_file.close()
-    
-
-
