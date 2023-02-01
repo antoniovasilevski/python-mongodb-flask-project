@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  overflow: hidden;
   font-family: sans-serif;
 }
 
@@ -15,13 +16,13 @@ body {
 
 .button-table {
   text-align: center;
-  width: 40%;
+  width: 60%;
   margin: 80px auto;
 
 }
 
 .function-button {
-  margin-left: -110px;
+  width: 400px;
   border: 6px solid #0452aa;
   background-color: white;
   color: #0452aa;
@@ -39,6 +40,7 @@ body {
 
 .input-button,
 .input-field {
+  box-sizing: border-box;
   border: 4px solid #0452aa;
   background-color: white;
   color: #0452aa;
@@ -47,10 +49,16 @@ body {
   font-weight: 600;
   box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.385);
   transition: all .1s linear;
+  outline: none;
 }
 
-.input-field::after {
-  border: 5px solid black;
+.input-field {
+  width: 120px;
+}
+
+.input-field:focus {
+  border-radius:0px !important;
+  border: 4px solid black;
 }
 
 .input-field::-webkit-outer-spin-button,
@@ -224,19 +232,19 @@ body {
 
 @keyframes loading-text {
   0% {
-    content: "Connectiong to SQL";
+    content: "Connecting to SQL";
   }
 
   5% {
-    content: "Connectiong to SQL.";
+    content: "Connecting to SQL.";
   }
 
   10% {
-    content: "Connectiong to SQL..";
+    content: "Connecting to SQL..";
   }
 
   15% {
-    content: "Connectiong to SQL...";
+    content: "Connecting to SQL...";
   }
 
   20% {
@@ -306,4 +314,60 @@ body {
   100% {
     content: "Bananas";
   }
+}
+
+/* Alerts */
+
+.error {
+  position: relative;
+  width: 80vw;
+  background: #edcccc;
+  color: #ab302d;
+  border: 1px solid #bb81807b;
+  border-radius: 10px;
+  margin: 15px auto;
+  padding: 20px;
+  text-align: left;
+}
+
+.success {
+  position: relative;
+  width: 80vw;
+  background: #DFF0D8;
+  color: #3C763D;
+  border: 1px solid #D6E9C6;
+  border-radius: 10px;
+  margin: 15px auto;
+  padding: 20px;
+  text-align: left;
+}
+
+#close {
+  margin-top: -4px;
+  transform: rotate(-45deg);
+  font-size: 25px;
+  border: none;
+  float: right;
+  background: transparent;                        
+	color: rgba(128, 128, 128, 0.312);
+	cursor: pointer;
+}
+
+#close:hover {
+  color: rgb(103, 103, 103);
+}
+
+#hideMe {
+  -webkit-animation: cssAnimation 4.5s forwards; 
+  animation: cssAnimation 4.5s forwards;
+}
+@keyframes cssAnimation {
+  0%   {top: 0;}
+  92%  {top: 0;}
+  100% {top: -100px;}
+}
+@-webkit-keyframes cssAnimation {
+  0%   {top: 0;}
+  92%  {top: 0;}
+  100% {top: -100px;}
 }

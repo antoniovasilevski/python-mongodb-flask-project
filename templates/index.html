@@ -5,6 +5,26 @@
 {% endblock %}
 
 {% block body %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+        <div class= {{ category }} role="alert" id="hideMe">
+            <table class="msg">
+                <tr>
+                    <td>
+                        <strong>
+                            {{ message }}
+                        </strong>
+                    </td>
+                    </td>
+                        <button id="close" onclick="hideAlert()">+</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 <div class="content">
     {{ outcome }}
     <div class="button-container">
@@ -50,10 +70,16 @@
     </tr>
 </table>
 <script type = "text/javascript">  
+
     function showOnClick() {  
         var showDiv = document.querySelector('.invisible').style.display = '';
     };
-</script>  
+
+    function hideAlert() {
+            var showDiv = document.getElementsByClassName('#hideMe').style.display = 'none';
+    };
+
+</script>
 {% endblock %} 
 {% block input %}{% endblock %}
 

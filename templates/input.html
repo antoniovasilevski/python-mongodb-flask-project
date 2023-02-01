@@ -18,16 +18,20 @@
         </form>
     </tr>
 </table>
-<script type="text/javascript">
-    document.querySelector('.input-button').addEventListener('click', function(event) {
-        var min = parseInt(document.getElementById('min-input').value);
-        var max = parseInt(document.getElementById('max-input').value);
-        if (max < min) {
-            alert('Error: the maximum value cannot be less than the minimum value');
-            event.preventDefault();
+<!-- <script type="text/javascript">
+
+    document.querySelector('.input-button').addEventListener('click', 
+        function(event) {
+            var min = parseInt(document.getElementById('min-input').value);
+            var max = parseInt(document.getElementById('max-input').value);
+
+            if (max < min) {
+                alert('Error: the maximum value cannot be less than the minimum value');
+                event.preventDefault();
         }
     });
-</script>
+        
+</script> -->
 {% endblock %}
 <div class="mongodb-content">
     {% block table %}{% endblock %}

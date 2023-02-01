@@ -50,7 +50,7 @@ This is a basic web application made in Flask, it takes an SQL database, reads a
 Then it encrypts the company data and writes it to a MongoDB database.
 Finally it reads the MongoDB database, decrypts the data and displays it in a html table.
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Product Name Screen Shot][images/product-screenshot]]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -64,10 +64,7 @@ To get a local copy up and running follow these simple example steps.
 ### Prerequisites
 
 * Python 3.10+
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+* MongoDB
 
 ### Installation
 
@@ -75,9 +72,9 @@ To get a local copy up and running follow these simple example steps.
    ```sh
    git clone https://github.com/antoniovasilevski/python-mongodb-flask-project
    ```
-2. Install NPM packages
+2. Install PIP packages
    ```sh
-   npm install pandas cryptography pymongo cleanco flask jinja2
+   pip install pandas cryptography pymongo cleanco flask jinja2
    ```
 3. Enter your SQLite database in `config.py`
    ```py
