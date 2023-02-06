@@ -1,6 +1,5 @@
 body {
   margin: 0;
-  overflow: hidden;
   font-family: sans-serif;
 }
 
@@ -320,7 +319,7 @@ body {
 
 .error {
   position: relative;
-  width: 80vw;
+  width: 50vw;
   background: #edcccc;
   color: #ab302d;
   border: 1px solid #bb81807b;
@@ -332,7 +331,7 @@ body {
 
 .success {
   position: relative;
-  width: 80vw;
+  width: 50vw;
   background: #DFF0D8;
   color: #3C763D;
   border: 1px solid #D6E9C6;
@@ -358,16 +357,20 @@ body {
 }
 
 #hideMe {
-  -webkit-animation: cssAnimation 4.5s forwards; 
-  animation: cssAnimation 4.5s forwards;
+  -webkit-animation: cssAnimation 6s forwards; 
+  animation: cssAnimation 6s forwards;
 }
 @keyframes cssAnimation {
-  0%   {top: 0;}
-  92%  {top: 0;}
+  0%   {top: -100px;}
+  10%   {top: -100px;}
+  20%   {top: 0;}
+  94%  {top: 0;}
   100% {top: -100px;}
 }
 @-webkit-keyframes cssAnimation {
-  0%   {top: 0;}
-  92%  {top: 0;}
+  0%   {top: -100px;}
+  10%   {top: -100px;}
+  20%   {top: 0;}
+  94%  {top: 0;}
   100% {top: -100px;}
 }

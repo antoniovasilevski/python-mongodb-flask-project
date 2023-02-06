@@ -1,8 +1,7 @@
 from flask import Flask, flash, render_template, request, url_for, redirect
-from custom_library import update_db, write_to_mongodb, mongodb_to_html
+from utils import update_db, write_to_mongodb, mongodb_to_html
 from cryptography.fernet import Fernet
 from config import get_key
-import js2py
 
 app = Flask(__name__)
 

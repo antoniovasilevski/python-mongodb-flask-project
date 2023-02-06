@@ -1,7 +1,7 @@
 ﻿<!-- PROJECT LOGO -->
 <br />
 
-<h1 align="center">Normalizer</h1>
+<h1 align="center">Data Cleaning</h1>
 
   <p align="center">
     Flask based web application used to normalizes company names and export the data to a MongoDB database.
@@ -35,8 +35,6 @@
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
@@ -50,7 +48,7 @@ This is a basic web application made in Flask, it takes an SQL database, reads a
 Then it encrypts the company data and writes it to a MongoDB database.
 Finally it reads the MongoDB database, decrypts the data and displays it in a html table.
 
-[![Product Name Screen Shot][images/product-screenshot]]
+[![Product Name Screen Shot][product-screenshot]]()
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -58,29 +56,46 @@ Finally it reads the MongoDB database, decrypts the data and displays it in a ht
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
 * Python 3.10+
 * MongoDB
+* SQLite
+
+### Packages
+
+* sqlite3
+* Flask
+* Pandas
+* Cryptography
+* Cleanco
+* PyMongo
+* Jinja
 
 ### Installation
 
 1. Clone the repo
+
    ```sh
    git clone https://github.com/antoniovasilevski/python-mongodb-flask-project
    ```
+
 2. Install PIP packages
+
    ```sh
-   pip install pandas cryptography pymongo cleanco flask jinja2
+   pip install sqlite3 pandas cryptography pymongo cleanco flask jinja2
    ```
+
 3. Enter your SQLite database in `config.py`
+
    ```py
    sql_database = "your_sqldb.db"
    ```
+
 4. Configure your MongoDB collection in `config.py`
+
    ```py
    mydb = myclient["your-mongodb"]
    mycol = mydb["your-collection"]
@@ -92,8 +107,60 @@ To get a local copy up and running follow these simple example steps.
 
 <!-- USAGE EXAMPLES -->
 ## Usage 
-<!-- TODO Finish this -->
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+
+### SQLite Database
+
+The sqlite database has one table - companies which consists of 7 columns (id, name, country_iso, city, nace, website, company_name_cleaned) and 20 000 rows.
+
+1. Using `read_sql_query()` from the Pandas library to read the database.
+
+  1.1. To change table name, replace `companies` in `update_db()` from `utils.py`.
+
+     ```py
+     df = pd.read_sql_query("SELECT * FROM companies", conn, dtype=object)
+     ```
+
+     ```py
+     company_data.to_sql('companies', conn, if_exists='replace', index=False)
+     ```
+
+  1.2. To change column name that you want to update, replace `company_name_cleaned` in `update_db()` from `utils.py`.
+
+     ```py
+     company_data['company_name_cleaned'] = []
+     ```
+
+     ```py
+     company_data['company_name_cleaned'].append(cleaned_name)
+     ```
+
+2. For data cleaning, a combination of a custom module - `clean_company_name()` and the Cleanco library is used.
+
+  In each row, the name is passed through the function and written to the `company_name_cleaned` column.
+
+  For further cleaning, add additional substrings to `remove_list` in `clean_company_name()` from `utils.py`.
+
+### MongoDB Database
+
+1. Using the `write_to_mongodb()` module from `utils.py`, a new `companies` collection is created.
+
+  Read the  SQLite database in chunks with a `pandas` SQL query, then encrypt it with a Fernet key and write it by chunks to the MongoDB collection.
+
+  1.1. Load SQLite database in chunks
+
+   ```py
+   df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=10000)
+   ```
+
+  1.2. Write to MongoDB with `insert_many`
+
+   ```py
+   mycol.insert_many(companies)
+   ```
+
+2. Exporting the MongoDB `companies` collection to a HTML table with `mongodb_to_html()` from `utils.py`
+
+  After the user inputs a range in the html form, find each row with a `find_one` query, decrypt the data using the Fernet secret key and write it to a HTML file.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -109,23 +176,6 @@ See the [open issues](https://github.com/antoniovasilevski/python-mongodb-flask-
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- CONTACT -->
@@ -149,24 +199,4 @@ Project Link: [https://github.com/antoniovasilevski/python-mongodb-flask-project
 [stars-url]: https://github.com/antoniovasilevski/python-mongodb-flask-project/stargazers
 [issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
 [issues-url]: https://github.com/antoniovasilevski/python-mongodb-flask-project/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/antoniovasilevski/python-mongodb-flask-project/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
-[product-screenshot]: images/project-example.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[product-screenshot]: /images/project-example.png

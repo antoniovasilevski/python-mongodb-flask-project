@@ -60,10 +60,14 @@ def clean_company_name(name_arg):
     
     # Checks for company names that start with an abbreviation
     modified = name_arg.split(' ')
+    
     if len(modified[0]) < 4 and modified[0] != "THE":
+        
         for id in range(1, len(modified)):
             modified[id] = modified[id].title()
+            
         name_arg = ' '.join(modified)
+        
         return name_arg
             
     name_arg = ' '.join(modified)
