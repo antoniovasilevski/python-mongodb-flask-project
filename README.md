@@ -48,7 +48,6 @@ This is a basic web application made in Flask, it takes an SQL database, reads a
 Then it encrypts the company data and writes it to a MongoDB database.
 Finally it reads the MongoDB database, decrypts the data and displays it in a html table.
 
-[![Product Name Screen Shot][product-screenshot]]()
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -118,9 +117,7 @@ The sqlite database has one table - companies which consists of 7 columns (id, n
 
      ```py
      df = pd.read_sql_query("SELECT * FROM companies", conn, dtype=object)
-     ```
 
-     ```py
      company_data.to_sql('companies', conn, if_exists='replace', index=False)
      ```
 
@@ -128,9 +125,7 @@ The sqlite database has one table - companies which consists of 7 columns (id, n
 
      ```py
      company_data['company_name_cleaned'] = []
-     ```
 
-     ```py
      company_data['company_name_cleaned'].append(cleaned_name)
      ```
 
