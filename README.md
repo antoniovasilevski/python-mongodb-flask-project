@@ -117,16 +117,12 @@ The sqlite database has one table - companies which consists of 7 columns (id, n
 
      ```py
      df = pd.read_sql_query("SELECT * FROM companies", conn, dtype=object)
-
-     company_data.to_sql('companies', conn, if_exists='replace', index=False)
      ```
 
   1.2. To change column name that you want to update, replace `company_name_cleaned` in `update_db()` from `utils.py`.
 
      ```py
-     company_data['company_name_cleaned'] = []
-
-     company_data['company_name_cleaned'].append(cleaned_name)
+     company_data['company_name_cleaned']
      ```
 
 2. For data cleaning, a combination of a custom module - `clean_company_name()` and the Cleanco library is used.
