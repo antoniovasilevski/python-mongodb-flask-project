@@ -107,11 +107,14 @@ To get a local copy up and running follow these simple example steps.
 <!-- USAGE EXAMPLES -->
 ## Usage 
 
+
 ### SQLite Database
 
 The sqlite database has one table - companies which consists of 7 columns (id, name, country_iso, city, nace, website, company_name_cleaned) and 20 000 rows.
 
+
 1. Using `read_sql_query()` from the Pandas library to read the database.
+
 
   1.1. To change table name, replace `companies` in `update_db()` from `utils.py`.
 
@@ -119,11 +122,13 @@ The sqlite database has one table - companies which consists of 7 columns (id, n
    df = pd.read_sql_query("SELECT * FROM companies", conn, dtype=object)
    ```
 
+
   1.2. To change column name that you want to update, replace `company_name_cleaned` in `update_db()` from `utils.py`.
 
    ```py
    company_data['company_name_cleaned']
    ```
+
 
 2. For data cleaning, a combination of a custom module - `clean_company_name()` and the Cleanco library is used.
 
@@ -131,11 +136,16 @@ The sqlite database has one table - companies which consists of 7 columns (id, n
 
   For further cleaning, add additional substrings to `remove_list` in `clean_company_name()` from `utils.py`.
 
+
+
 ### MongoDB Database
+
 
 1. Using the `write_to_mongodb()` module from `utils.py`, a new `companies` collection is created.
 
+
   Read the  SQLite database in chunks with a `pandas` SQL query, then encrypt it with a Fernet key and write it by chunks to the MongoDB collection.
+
 
   1.1. Load SQLite database in chunks
 
@@ -143,15 +153,18 @@ The sqlite database has one table - companies which consists of 7 columns (id, n
    df = pd.read_sql_query("SELECT * FROM companies", conn, chunksize=10000)
    ```
 
+
   1.2. Write to MongoDB with `insert_many`
 
    ```py
    mycol.insert_many(companies)
    ```
 
+
 2. Exporting the MongoDB `companies` collection to a HTML table with `mongodb_to_html()` from `utils.py`
 
   After the user inputs a range in the html form, find each row with a `find_one` query, decrypt the data using the Fernet secret key and write it to a HTML file.
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
